@@ -220,7 +220,7 @@ const Reports = () => {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [value, 'Nombre d\'articles']} />
+                    <Tooltip formatter={(value: any) => [value as number, 'Nombre d\'articles']} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -269,7 +269,7 @@ const Reports = () => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip formatter={(value) => [formatCurrency(value), 'Profit Moyen']} />
+                    <Tooltip formatter={(value: any) => [formatCurrency(value as number), 'Profit Moyen']} />
                     <Legend />
                     <Bar dataKey="avgProfit" name="Profit Moyen" fill="#3B82F6" />
                   </BarChart>
@@ -295,7 +295,7 @@ const Reports = () => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="id" label={{ value: 'ID d\'évaluation', position: 'insideBottom', offset: -5 }} />
                     <YAxis />
-                    <Tooltip formatter={(value, name) => [formatCurrency(value), 'Profit']} />
+                    <Tooltip formatter={(value: any) => [formatCurrency(value as number), 'Profit']} />
                     <Legend />
                     <Bar dataKey="profit" name="Profit" fill="#3B82F6" />
                   </BarChart>
