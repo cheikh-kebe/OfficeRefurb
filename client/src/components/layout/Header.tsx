@@ -16,7 +16,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="bg-primary-700 text-white shadow-lg sticky top-0 z-10">
+    <header className="bg-primary text-white shadow-lg sticky top-0 z-10">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center cursor-pointer">
@@ -41,11 +41,13 @@ const Header = () => {
         
         <div className="hidden md:flex items-center space-x-6">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <a className={`hover:text-accent-300 font-medium transition-colors ${location === item.href ? 'text-accent-300' : ''}`}>
-                {item.label}
-              </a>
-            </Link>
+            <div key={item.href} className="font-medium">
+              <Link href={item.href}>
+                <span className={`hover:text-gray-200 cursor-pointer transition-colors ${location === item.href ? 'text-white font-bold underline underline-offset-4' : ''}`}>
+                  {item.label}
+                </span>
+              </Link>
+            </div>
           ))}
         </div>
         
@@ -59,16 +61,18 @@ const Header = () => {
           <SheetContent side="right" className="w-[250px] sm:w-[300px]">
             <nav className="flex flex-col gap-4 mt-8">
               {navItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <a 
-                    className={`px-2 py-1 rounded-md font-medium hover:bg-primary-50 transition-colors ${
-                      location === item.href ? 'bg-primary-100 text-primary-700' : ''
-                    }`}
-                    onClick={() => setOpen(false)}
-                  >
-                    {item.label}
-                  </a>
-                </Link>
+                <div key={item.href}>
+                  <Link href={item.href}>
+                    <span 
+                      className={`px-2 py-1 rounded-md font-medium cursor-pointer block hover:bg-primary-50 transition-colors ${
+                        location === item.href ? 'bg-primary-100 text-primary' : ''
+                      }`}
+                      onClick={() => setOpen(false)}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
+                </div>
               ))}
             </nav>
           </SheetContent>
