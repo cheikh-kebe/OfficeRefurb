@@ -3,7 +3,8 @@ import {
   furniture, type Furniture, type InsertFurniture,
   repairs, type Repair, type InsertRepair,
   cleaningItems, type CleaningItem, type InsertCleaningItem,
-  assessments, type Assessment, type InsertAssessment
+  assessments, type Assessment, type InsertAssessment,
+  photos, type Photo, type InsertPhoto
 } from "@shared/schema";
 
 export interface IStorage {
@@ -39,6 +40,13 @@ export interface IStorage {
   updateAssessment(id: number, assessment: Partial<InsertAssessment>): Promise<Assessment | undefined>;
   deleteAssessment(id: number): Promise<boolean>;
   
+  // Photo methods
+  createPhoto(photo: InsertPhoto): Promise<Photo>;
+  getPhotosByFurnitureId(furnitureId: number, type?: string): Promise<Photo[]>;
+  getPhoto(id: number): Promise<Photo | undefined>;
+  updatePhoto(id: number, photo: Partial<InsertPhoto>): Promise<Photo | undefined>;
+  deletePhoto(id: number): Promise<boolean>;
+  
   // Similar items
   getSimilarItems(furnitureType: string, limit?: number): Promise<Assessment[]>;
 }
@@ -49,12 +57,14 @@ export class MemStorage implements IStorage {
   private repairItems: Map<number, Repair>;
   private cleaningItems: Map<number, CleaningItem>;
   private assessmentItems: Map<number, Assessment>;
+  private photoItems: Map<number, Photo>;
   
   private userCurrentId: number;
   private furnitureCurrentId: number;
   private repairCurrentId: number;
   private cleaningCurrentId: number;
   private assessmentCurrentId: number;
+  private photoCurrentId: number;
 
   constructor() {
     this.users = new Map();
@@ -62,12 +72,14 @@ export class MemStorage implements IStorage {
     this.repairItems = new Map();
     this.cleaningItems = new Map();
     this.assessmentItems = new Map();
+    this.photoItems = new Map();
     
     this.userCurrentId = 1;
     this.furnitureCurrentId = 1;
     this.repairCurrentId = 1;
     this.cleaningCurrentId = 1;
     this.assessmentCurrentId = 1;
+    this.photoCurrentId = 1;
     
     // Add some starter data
     this.seedData();
@@ -215,6 +227,72 @@ export class MemStorage implements IStorage {
   
   async deleteAssessment(id: number): Promise<boolean> {
     return this.assessmentItems.delete(id);
+  }
+  
+  // Photo methods
+  async createPhoto(photo: InsertPhoto): Promise<Photo> {
+    const id = this.photoCurrentId++;
+    const newPhoto: Photo = { 
+      ...photo, 
+      id,
+      createdAt: new Date() 
+    };
+    this.photoItems.set(id, newPhoto);
+    
+    // Update furniture hasPhoto flag if not already set
+    const furniture = this.furnitureItems.get(photo.furnitureId);
+    if (furniture && !furniture.hasPhoto) {
+      this.updateFurniture(furniture.id, { hasPhoto: true });
+    }
+    
+    return newPhoto;
+  }
+  
+  async getPhoto(id: number): Promise<Photo | undefined> {
+    return this.photoItems.get(id);
+  }
+  
+  async getPhotosByFurnitureId(furnitureId: number, type?: string): Promise<Photo[]> {
+    const photos = Array.from(this.photoItems.values()).filter(
+      photo => photo.furnitureId === furnitureId
+    );
+    
+    if (type) {
+      return photos.filter(photo => photo.type === type);
+    }
+    
+    return photos;
+  }
+  
+  async updatePhoto(id: number, photoUpdate: Partial<InsertPhoto>): Promise<Photo | undefined> {
+    const photo = this.photoItems.get(id);
+    if (!photo) return undefined;
+    
+    const updatedPhoto = { ...photo, ...photoUpdate };
+    this.photoItems.set(id, updatedPhoto);
+    return updatedPhoto;
+  }
+  
+  async deletePhoto(id: number): Promise<boolean> {
+    const photo = this.photoItems.get(id);
+    if (!photo) return false;
+    
+    const result = this.photoItems.delete(id);
+    
+    // Check if this was the last photo for the furniture
+    const remainingPhotos = Array.from(this.photoItems.values()).filter(
+      p => p.furnitureId === photo.furnitureId
+    );
+    
+    if (remainingPhotos.length === 0) {
+      // Update furniture hasPhoto flag
+      const furniture = this.furnitureItems.get(photo.furnitureId);
+      if (furniture && furniture.hasPhoto) {
+        this.updateFurniture(furniture.id, { hasPhoto: false });
+      }
+    }
+    
+    return result;
   }
   
   // Similar items

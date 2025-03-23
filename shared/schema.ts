@@ -101,3 +101,22 @@ export const insertAssessmentSchema = createInsertSchema(assessments).omit({
 
 export type InsertAssessment = z.infer<typeof insertAssessmentSchema>;
 export type Assessment = typeof assessments.$inferSelect;
+
+// Photos
+export const photos = pgTable("photos", {
+  id: serial("id").primaryKey(),
+  furnitureId: integer("furniture_id").notNull().references(() => furniture.id),
+  url: text("url").notNull(),
+  filename: text("filename").notNull(),
+  type: text("type").notNull(), // 'before', 'after', 'damage'
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertPhotoSchema = createInsertSchema(photos).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPhoto = z.infer<typeof insertPhotoSchema>;
+export type Photo = typeof photos.$inferSelect;
