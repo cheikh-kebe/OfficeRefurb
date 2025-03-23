@@ -52,7 +52,7 @@ const Catalog = () => {
   
   // Get unique furniture types
   const furnitureTypes = furniture 
-    ? [...new Set(furniture.map(item => item.type))]
+    ? Array.from(new Set(furniture.map(item => item.type)))
     : [];
   
   // Combine furniture and assessments data
@@ -77,7 +77,7 @@ const Catalog = () => {
         item.description?.toLowerCase().includes(searchLower);
       
       // Apply type filter
-      const matchesType = typeFilter === "" || item.type === typeFilter;
+      const matchesType = typeFilter === "" || typeFilter === "all" || item.type === typeFilter;
       
       return matchesSearch && matchesType;
     });
@@ -146,7 +146,7 @@ const Catalog = () => {
                 <SelectValue placeholder="Tous les types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les types</SelectItem>
+                <SelectItem value="all">Tous les types</SelectItem>
                 {furnitureTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
