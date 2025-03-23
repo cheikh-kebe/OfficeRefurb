@@ -8,6 +8,7 @@ import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
 import Assessment from "./pages/Assessment";
 import Catalog from "./pages/Catalog";
+import Reports from "./pages/Reports";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/assessment" component={Assessment} />
       <Route path="/assessment/:id" component={Assessment} />
       <Route path="/catalog" component={Catalog} />
+      <Route path="/reports" component={Reports} />
       <Route component={NotFound} />
     </Switch>
   );
