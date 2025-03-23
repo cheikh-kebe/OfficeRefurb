@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -59,9 +59,9 @@ const FurnitureDetails: React.FC<FurnitureDetailsProps> = ({
   const formValues = form.watch();
   
   // Use effect to notify parent when values change
-  useState(() => {
+  useEffect(() => {
     onValuesChange(formValues);
-  });
+  }, [formValues, onValuesChange]);
 
   return (
     <div className="mb-6">

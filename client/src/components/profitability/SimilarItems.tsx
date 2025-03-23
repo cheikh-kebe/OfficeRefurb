@@ -61,9 +61,9 @@ const SimilarItems: React.FC<SimilarItemsProps> = ({ furnitureType }) => {
         ))}
       </ul>
       <Link href="/catalog">
-        <a className="text-sm text-primary-600 hover:text-primary-800 mt-3 inline-block">
+        <span className="text-sm text-primary-600 hover:text-primary-800 mt-3 inline-block cursor-pointer">
           Voir tous les {furnitureType.toLowerCase()} reconditionnés →
-        </a>
+        </span>
       </Link>
     </div>
   );
