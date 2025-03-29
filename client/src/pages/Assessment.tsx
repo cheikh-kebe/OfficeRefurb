@@ -4,12 +4,14 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import FurnitureDetails from "@/components/furniture/FurnitureDetails";
 import ReconditioningAssessment from "@/components/furniture/ReconditioningAssessment";
 import SalesProjection from "@/components/furniture/SalesProjection";
+import PhotoUpload from "@/components/furniture/PhotoUpload";
 import ProfitabilitySummary from "@/components/profitability/ProfitabilitySummary";
 import { 
   FurnitureFormData, 
@@ -332,23 +334,48 @@ const Assessment = () => {
           <p className="text-sm text-gray-600">Analysez la rentabilité du reconditionnement de ce mobilier</p>
         </div>
         
-        <FurnitureDetails 
-          defaultValues={furnitureData} 
-          onValuesChange={handleFurnitureDetailsChange} 
-        />
-        
-        <ReconditioningAssessment 
-          repairItems={repairItems}
-          cleaningItems={cleaningItems}
-          onRepairItemsChange={setRepairItems}
-          onCleaningItemsChange={setCleaningItems}
-          furnitureId={id ? parseInt(id) : 0}
-        />
-        
-        <SalesProjection 
-          defaultValues={salesData}
-          onValuesChange={handleSalesProjectionChange}
-        />
+        <Tabs defaultValue="details" className="w-full mb-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="details">Détails</TabsTrigger>
+            <TabsTrigger value="reconditioning">Reconditionnement</TabsTrigger>
+            <TabsTrigger value="sales">Projections</TabsTrigger>
+            <TabsTrigger value="photos">Photos</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="details">
+            <FurnitureDetails 
+              defaultValues={furnitureData} 
+              onValuesChange={handleFurnitureDetailsChange} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="reconditioning">
+            <ReconditioningAssessment 
+              repairItems={repairItems}
+              cleaningItems={cleaningItems}
+              onRepairItemsChange={setRepairItems}
+              onCleaningItemsChange={setCleaningItems}
+              furnitureId={id ? parseInt(id) : 0}
+            />
+          </TabsContent>
+          
+          <TabsContent value="sales">
+            <SalesProjection 
+              defaultValues={salesData}
+              onValuesChange={handleSalesProjectionChange}
+            />
+          </TabsContent>
+          
+          <TabsContent value="photos">
+            {id ? (
+              <PhotoUpload furnitureId={parseInt(id)} />
+            ) : (
+              <div className="p-6 text-center bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-amber-700">Veuillez d'abord enregistrer ce meuble comme brouillon avant d'ajouter des photos.</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
         
         <div className="flex justify-end space-x-3">
           <Button 

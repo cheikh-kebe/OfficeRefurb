@@ -89,6 +89,32 @@ export type FurnitureTypeOption =
   | "Étagère" 
   | "Caisson";
 
+export type PhotoType = "before" | "after" | "damage";
+
+export interface PhotoItem {
+  id: number;
+  furnitureId: number;
+  url: string;
+  filename: string;
+  type: PhotoType;
+  description: string | null;
+  createdAt: Date;
+}
+
+export interface PhotoUploadData {
+  furnitureId: number;
+  url: string;
+  filename: string;
+  type: PhotoType;
+  description?: string;
+}
+
+export const photoTypes: {value: PhotoType, label: string}[] = [
+  { value: "before", label: "Avant Reconditionnement" },
+  { value: "after", label: "Après Reconditionnement" },
+  { value: "damage", label: "Dommages" }
+];
+
 export const furnitureTypes: FurnitureTypeOption[] = [
   "Chaise de Bureau",
   "Bureau",

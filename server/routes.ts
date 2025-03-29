@@ -1,7 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertFurnitureSchema, insertRepairSchema, insertCleaningItemSchema, insertAssessmentSchema } from "@shared/schema";
+import { 
+  insertFurnitureSchema, 
+  insertRepairSchema, 
+  insertCleaningItemSchema, 
+  insertAssessmentSchema,
+  insertPhotoSchema
+} from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -260,6 +266,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Photo routes
+  app.get("/api/furniture/:furnitureId/photos", async (req, res) => {
+    try {
+      const furnitureId = parseInt(req.params.furnitureId);
+      const type = req.query.type as string | undefined;
+      const photos = await storage.getPhotosByFurnitureId(furnitureId, type);
+      res.json(photos);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to retrieve photos" });
+    }
+  });
+
+  app.get("/api/photos/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const photo = await storage.getPhoto(id);
+      if (!photo) {
+        return res.status(404).json({ message: "Photo not found" });
+      }
+      res.json(photo);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to retrieve photo" });
+    }
+  });
+
+  app.post("/api/photos", async (req, res) => {
+    try {
+      const validatedData = insertPhotoSchema.parse(req.body);
+      const photo = await storage.createPhoto(validatedData);
+      res.status(201).json(photo);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid photo data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create photo" });
+    }
+  });
+
+  app.put("/api/photos/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertPhotoSchema.partial().parse(req.body);
+      const photo = await storage.updatePhoto(id, validatedData);
+      if (!photo) {
+        return res.status(404).json({ message: "Photo not found" });
+      }
+      res.json(photo);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid photo data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update photo" });
+    }
+  });
+
+  app.delete("/api/photos/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deletePhoto(id);
+      if (!success) {
+        return res.status(404).json({ message: "Photo not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete photo" });
+    }
+  });
+  
   // Similar items route
   app.get("/api/similar-items/:type", async (req, res) => {
     try {
